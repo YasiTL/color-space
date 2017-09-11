@@ -53,7 +53,7 @@
         container.appendChild(renderer.domElement);
 
         //CONTROLS
-        controls = new THREE.OrbitControls(camera, renderer.domElement); //Makes control object calling the OrbitControls Method
+        //controls = new THREE.OrbitControls(camera, renderer.domElement); //Makes control object calling the OrbitControls Method
 
         //STATS (This is just general code. Was copied)
         stats = new Stats();
@@ -98,10 +98,17 @@
                 face.vertexColors[j] = color;
             }
         }
+
         cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
         cube.position.set(100, 50, 0);
         scene.add(cube);
     }
+
+        function rotateCube() {
+            cube.rotation.x -= 0.005 * 2;
+            cube.rotation.y -= 0.005;
+            cube.rotation.z -= 0.005 * 3;
+        }
 
         function animate() {
             requestAnimationFrame(animate);
@@ -111,6 +118,8 @@
 
         function render() {
             renderer.render(scene, camera);
+            rotateCube()
+
         }
 
 </script>
