@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Trial 1 of RGB Color Space</title>
-</head>
+<body>Something Something Something</body>
 
 <body>
 
@@ -11,9 +11,10 @@
 <script src="js/three.min.js"></script>
 <script src="js/Detector.js"></script>
 <script src="js/Stats.js"></script>
-<script src="js/OrbitControls.js"></script> <!-- //Orbiting around scene -->
+<!--<script src="js/OrbitControls.js"></script> <!-- //Orbiting around scene -->
+<script src="js/TrackballControls.js"></script>
 <!--<script src="js/THREEx.KeyboardState.js"></script>--> <!--Currently Not Needed. -->
-<!--<script src="js/THREEx.FullScreen.js"></script> --> <!--Intially out. Makes working with FS easier. -->
+<script src="js/THREEx.FullScreen.js"></script> <!--Intially out. Makes working with FS easier. -->
 <script src="js/THREEx.WindowResize.js"></script> <!--Makes window resizing better. -->
 
 <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
@@ -21,11 +22,10 @@
 <script>
 
     //General Global Variables
-    var container, scene, camera, tenderer, controls, stats;
-    var clock = new THREE.Clock();
+    var container, scene, camera, renderer, controls;
 
     //Custom Global variables
-    var cube;
+    var cube, isClick;
 
     init();
     animate();
@@ -39,7 +39,7 @@
         var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000; //Sets view angle, aspect ratio, camera distance
         camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR); //Declares camera = new three object camera using above var
         scene.add(camera);
-        camera.position.set(0, 150, 400); //Set Camera position to 0x, 150y, 400x
+        camera.position.set(0, 0, 300); //Set Camera position to 0x, 150y, 400x
         camera.lookAt(scene.position); //when init, camera look at position of the scene
 
         //RENDERER
@@ -48,50 +48,44 @@
         } else {
             renderer = new THREE.CanvasRenderer();
         }
+
         renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         container = document.getElementById('ThreeJS');
         container.appendChild(renderer.domElement);
 
-        //CONTROLS
-        //controls = new THREE.OrbitControls(camera, renderer.domElement); //Makes control object calling the OrbitControls Method
+        renderer.setClearColor(0x272727, 1);
 
-        //STATS (This is just general code. Was copied)
-        stats = new Stats();
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.bottom = '0px';
-        stats.domElement.style.zIndex = 100;
-        container.appendChild(stats.domElement);
+        THREEx.WindowResize(renderer, camera);
+
+        //CONTROLS
+        setControls();
 
         //LIGHT
-        var light = new THREE.PointLight(0xffffff);
-        light.position.set(0, 250, 0);
+        var light = new THREE.AmbientLight(0xffffff);
+        //light.position.set(0, 250, 0);
         scene.add(light); //Add the new point light to the scene
 
         // this material causes a mesh to use colors assigned to vertices
         //   different colors at face vertices create gradient effect
-        var cubeMaterial = new THREE.MeshBasicMaterial(
-            {color: 0xffffff, vertexColors: THREE.VertexColors});
+        var cubeMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, vertexColors: THREE.VertexColors});
 
         var color, face, numberOfSides, vertexIndex;
-
-
-        //////////////////////////////////////////////////////////////////////
 
         var faceIndices = ['a', 'b', 'c', 'd'];
 
         // RGB color cube
         var size = 80;
         var point;
-        var cubeGeometry = new THREE.CubeGeometry(size, size, size, 1, 1, 1);
-        for (var i = 0; i < cubeGeometry.faces.length; i++) {
-            face = cubeGeometry.faces[i];
+        var boxGeometry = new THREE.BoxGeometry(size, size, size, 5, 5, 5);
+        for (var i = 0; i < boxGeometry.faces.length; i++) {
+            face = boxGeometry.faces[i];
             // determine if current face is a tri or a quad
             numberOfSides = ( face instanceof THREE.Face3 ) ? 3 : 4;
             // assign color to each vertex of current face
             for (var j = 0; j < numberOfSides; j++) {
                 vertexIndex = face[faceIndices[j]];
                 // store coordinates of vertex
-                point = cubeGeometry.vertices[vertexIndex];
+                point = boxGeometry.vertices[vertexIndex];
                 // initialize color variable
                 color = new THREE.Color(0xffffff);
                 color.setRGB(0.5 + point.x / size, 0.5 + point.y / size, 0.5 + point.z / size);
@@ -99,28 +93,44 @@
             }
         }
 
-        cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-        cube.position.set(100, 50, 0);
+        cube = new THREE.Mesh(boxGeometry, cubeMaterial);
+        cube.position.set(0, 0, 0);
+        cube.rotateY(20); //setting persepctive
+        cube.rotateX(-20); //setting perspective
         scene.add(cube);
     }
 
-        function rotateCube() {
-            cube.rotation.x -= 0.005 * 2;
-            cube.rotation.y -= 0.005;
-            cube.rotation.z -= 0.005 * 3;
-        }
+    function setControls() {
+        controls = new THREE.TrackballControls(camera);
+        controls.rotateSpeed = 3.0;
+        controls.staticMoving = false;
+        controls.noZoom = true;
+        controls.noPan = true;
+        controls.dynamicDampingFactor = 0.4;
+        controls.addEventListener('click', rotateCube);
+    }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            render();
-        }
-
-
-        function render() {
-            renderer.render(scene, camera);
-            rotateCube()
+    function rotateCube() {
+        if (click = true){
 
         }
+        else {
+            cube.rotation.x -= 0.003 * 2;
+            cube.rotation.y -= 0.003;
+            cube.rotation.z -= 0.003 * 3;
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        render();
+        controls.update();
+    }
+
+    function render() {
+        renderer.render(scene, camera);
+        rotateCube();
+    }
 
 </script>
 
