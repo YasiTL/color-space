@@ -27,13 +27,25 @@
     var container, scene, camera, renderer, controls;
 
     //Custom Global variables
-    var cube, isClick;
+    var cube, rotationRate;
 
     init();
     animate();
 
+
     //FUNCTIONS
     function init() { //These things need to be initialized prior to any movement of the webpage
+
+        rotationRate = 0.003;
+        window.onmousedown = function(){
+            console.log("mouse is down");
+            rotationRate = 0;
+        };
+        window.onmouseup = function () {
+          setInterval(function() {
+              rotationRate = 0.003;
+          }, 3000)
+        };
 
         scene = new THREE.Scene(); //Creates a new scene
 
@@ -102,35 +114,35 @@
         scene.add(cube);
     }
 
+
+
     function setControls() {
-        controls = new THREE.TrackballControls(camera);
+        controls = new THREE.TrackballControls(cube);
         controls.rotateSpeed = 3.0;
         controls.staticMoving = false;
         controls.noZoom = true;
         controls.noPan = true;
         controls.dynamicDampingFactor = 0.4;
-        controls.addEventListener('click', rotateCube);
+        //controls.addEventListener('click', function() {
+            //rotationRate = 0;
+        //});
+        //controls.addEventListener('rotate', rotateCube);
     }
 
     function rotateCube() {
-        if (click = true){
-
-        }
-        else {
-            cube.rotation.x -= 0.003 * 2;
-            cube.rotation.y -= 0.003;
-            cube.rotation.z -= 0.003 * 3;
-        }
+           cube.rotation.x -= rotationRate * 2;
+           cube.rotation.y -= rotationRate;
+           cube.rotation.z -= rotationRate * 3;
     }
 
     function animate() {
         requestAnimationFrame(animate);
         render();
-        controls.update();
     }
 
     function render() {
         renderer.render(scene, camera);
+        controls.update();
         rotateCube();
     }
 
